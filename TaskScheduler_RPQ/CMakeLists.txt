@@ -3,7 +3,14 @@
 #
 
 # Add source to this project's executable.
-add_executable (TaskScheduler "main.cpp")
+add_executable(TaskScheduler
+  "main.cpp"
+  "Task.cpp"
+  "TaskIO.cpp"
+  "SchedulingAlgorithms.cpp"
+  "CarlierSolver.cpp"
+  "TaskSchedulerApp.cpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TaskScheduler PROPERTY CXX_STANDARD 20)
