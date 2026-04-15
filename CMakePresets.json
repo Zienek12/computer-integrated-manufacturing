@@ -58,6 +58,38 @@
             }
         },
         {
+            "name": "windows-gcc-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc.exe",
+                "CMAKE_CXX_COMPILER": "g++.exe"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "x64-debug-gcc",
+            "displayName": "x64 Debug (GCC)",
+            "inherits": "windows-gcc-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "x64-release-gcc",
+            "displayName": "x64 Release (GCC)",
+            "inherits": "x64-debug-gcc",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
             "name": "linux-debug",
             "displayName": "Linux Debug",
             "generator": "Ninja",
@@ -96,6 +128,16 @@
                     "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
                 }
             }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "x64-debug-gcc",
+            "configurePreset": "x64-debug-gcc"
+        },
+        {
+            "name": "x64-release-gcc",
+            "configurePreset": "x64-release-gcc"
         }
     ]
 }

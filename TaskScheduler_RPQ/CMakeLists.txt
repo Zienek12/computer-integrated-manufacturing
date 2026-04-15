@@ -3,10 +3,17 @@
 #
 
 # Add source to this project's executable.
-add_executable (KIZ "main.cpp")
+add_executable(TaskScheduler
+  "main.cpp"
+  "Task.cpp"
+  "TaskIO.cpp"
+  "SchedulingAlgorithms.cpp"
+  "CarlierSolver.cpp"
+  "TaskSchedulerApp.cpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET KIZ PROPERTY CXX_STANDARD 20)
+  set_property(TARGET TaskScheduler PROPERTY CXX_STANDARD 20)
 endif()
 
 # TODO: Add tests and install targets if needed.
