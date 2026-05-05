@@ -14,13 +14,11 @@ struct Job {
     int d;
 };
 
-// Oblicza kar? dla zadania zakoczonego w konkretnym czasie
 int calculateJobPenalty(const Job& job, int completionTime) {
     int tardiness = std::max(0, completionTime - job.d);
     return job.w * tardiness;
 }
 
-// Oblicza ca?kowit? kar? dla podanej kolejno?ci zada?.
 int calculateTotalPenalty(const std::vector<Job>& jobs, const std::vector<int>& order) {
     int currentTime = 0;
     int totalPenalty = 0;
@@ -33,17 +31,13 @@ int calculateTotalPenalty(const std::vector<Job>& jobs, const std::vector<int>& 
     return totalPenalty;
 }
 
-// generuje wszystkie mo?liwe permutacje
-// kolejno?ci zada? i na bie??co szuka tej o najmniejszej karze.
 void solveBruteForce(const std::string& name, int n, const std::vector<Job>& jobs) {
-    // 1. Inicjalizacja wektora indeksów: {0, 1, 2, ..., n-1}
     std::vector<int> order(n);
     std::iota(order.begin(), order.end(), 0);
 
     int minPenalty = std::numeric_limits<int>::max();
     std::vector<int> bestOrder;
 
-    // Generowanie permutacji
     do {
         int currentPenalty = calculateTotalPenalty(jobs, order);
 
@@ -54,6 +48,69 @@ void solveBruteForce(const std::string& name, int n, const std::vector<Job>& job
     } while (std::next_permutation(order.begin(), order.end()));
 
     std::cout << name << " (Przeszukiwanie Zupelne): " << minPenalty << "\nBest order: ";
+    for (int idx : bestOrder) {
+        std::cout << (idx + 1) << " "; 
+    }
+    std::cout << "\n\n";
+}
+
+std::vector<int> calculateCompletionTimes(int n, int num_masks, const std::vector<Job>& jobs) {
+    std::vector<int> c(num_masks, 0);
+    for (int mask = 1; mask < num_masks; ++mask) {
+        for (int i = 0; i < n; ++i) {
+            if (mask & (1 << i)) {
+                c[mask] += jobs[i].p;
+            }
+        }
+    }
+    return c;
+}
+
+void computeDPCore(int n, int num_masks, const std::vector<Job>& jobs, const std::vector<int>& c, 
+                   std::vector<int>& dp, std::vector<int>& parent, std::vector<int>& lastJob) {
+    for (int mask = 1; mask < num_masks; ++mask) {
+        for (int i = 0; i < n; ++i) {
+            if (mask & (1 << i)) { 
+                int prev_mask = mask ^ (1 << i); 
+                int penalty = calculateJobPenalty(jobs[i], c[mask]);
+                int cost = dp[prev_mask] + penalty;
+
+                if (cost < dp[mask]) {
+                    dp[mask] = cost;
+                    parent[mask] = prev_mask; 
+                    lastJob[mask] = i;        
+                }
+            }
+        }
+    }
+}
+
+std::vector<int> reconstructBestOrder(int num_masks, const std::vector<int>& parent, const std::vector<int>& lastJob) {
+    std::vector<int> bestOrder;
+    int curr_mask = num_masks - 1; 
+    while (curr_mask > 0) {
+        bestOrder.push_back(lastJob[curr_mask]);
+        curr_mask = parent[curr_mask];
+    }
+    std::reverse(bestOrder.begin(), bestOrder.end()); 
+    return bestOrder;
+}
+
+void solveDP(const std::string& name, int n, const std::vector<Job>& jobs) {
+    int num_masks = 1 << n; 
+    std::vector<int> dp(num_masks, 1e9);
+    dp[0] = 0;
+
+    std::vector<int> parent(num_masks, -1);
+    std::vector<int> lastJob(num_masks, -1);
+
+    std::vector<int> c = calculateCompletionTimes(n, num_masks, jobs);
+
+    computeDPCore(n, num_masks, jobs, c, dp, parent, lastJob);
+
+    std::vector<int> bestOrder = reconstructBestOrder(num_masks, parent, lastJob);
+
+    std::cout << name << " (Dynamic programming): " << dp[num_masks - 1] << "\nBest order: ";
     for (int idx : bestOrder) {
         std::cout << (idx + 1) << " "; 
     }
@@ -80,17 +137,13 @@ void loadAndSolve(const std::string& filename) {
                 file >> jobs[i].p >> jobs[i].w >> jobs[i].d;
             }
 
-            // algorytm Brute Force (n!) drastycznie obci??a procesor.
-            if (n <= 11) {
-                solveBruteForce(line, n, jobs);
-            } else {
-                 std::cout << line << ": pominieto ze wzgledu na dlugi czas dzialania (n > 11)\n";
-            }
+            solveDP(line, n, jobs);
+
         }
     }
 }
 
 int main() {
-    loadAndSolve("C:/Users/andos/source/repos/computer-integrated-manufacturing/WiTi/data.txt");
+    loadAndSolve("../../../../WiTi/data.txt");
     return 0;
 }
