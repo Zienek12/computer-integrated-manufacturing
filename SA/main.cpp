@@ -62,7 +62,7 @@ public:
         std::vector<int> path;
         std::vector<bool> visited(size, false);
 
-        int current = 0; // Zaczynamy w w??le 0
+        int current = 0; 
         path.push_back(current);
         visited[current] = true;
 
@@ -85,7 +85,7 @@ public:
             visited[current] = true;
         }
 
-        path.push_back(0); // Powrót do startu
+        path.push_back(0);
         return path;
     }
 
@@ -114,7 +114,7 @@ public:
     std::vector<int> GetStartPath(size_t size) {
         std::vector<int> path(size);
         for (size_t i = 0; i < size; ++i) path[i] = i;
-        path.push_back(0); // powrót do startu
+        path.push_back(0); 
         return path;
     }
 
