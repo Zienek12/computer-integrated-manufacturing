@@ -14,3 +14,4 @@ project ("CIM")
 # Include sub-projects.
 add_subdirectory ("TaskScheduler_RPQ")
 add_subdirectory("WiTi")
+add_subdirectory("SA")
